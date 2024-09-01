@@ -27,7 +27,7 @@
             grid-template-rows: repeat(4, 1fr);
             gap: 0.5em;
             margin-bottom: 1em;
-            max-width: 400px; /* Ajustado para un diseño más compacto */
+            max-width: 400px;
             width: 100%;
         }
         .bingo-number {
@@ -41,9 +41,8 @@
             border-radius: 0.5em;
             cursor: pointer;
             transition: transform 0.2s ease, background-color 0.2s ease;
-            aspect-ratio: 1; /* Mantiene una relación de aspecto cuadrado */
+            aspect-ratio: 1;
             height: 100%;
-            position: relative;
         }
         .bingo-number:hover {
             transform: scale(1.1);
@@ -51,23 +50,12 @@
         .marked {
             background-color: #4CAF50 !important;
         }
-        .multiplicacion {
-            position: absolute;
-            bottom: 0.2em;
-            right: 0.5em;
-            font-size: 0.8rem;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 0.2em;
-            border-radius: 0.2em;
-            display: none;
-        }
         .controls {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 400px; /* Ajustado para un diseño más compacto */
+            max-width: 400px;
         }
         button {
             padding: 0.75em 1.5em;
@@ -91,47 +79,6 @@
             font-size: 1.2rem;
             color: #e74c3c;
         }
-
-        /* Media Queries */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-            #bingoCard {
-                grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: repeat(4, 1fr);
-            }
-            .bingo-number {
-                font-size: 1.2rem;
-            }
-            button {
-                font-size: 0.9rem;
-                padding: 0.5em 1em;
-            }
-            .timer {
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 400px) {
-            h1 {
-                font-size: 1.2rem;
-            }
-            #bingoCard {
-                grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: repeat(4, 1fr);
-            }
-            .bingo-number {
-                font-size: 1rem;
-            }
-            button {
-                font-size: 0.8rem;
-                padding: 0.4em 0.8em;
-            }
-            .timer {
-                font-size: 0.9rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -142,6 +89,7 @@
 
     <div class="controls">
         <button id="generateButton" onclick="generateBingoCard()">Generar Nueva Planilla</button>
+        <button id="bingoButton" disabled>¡Bingo!</button>
         <div class="timer" id="timer"></div>
     </div>
 
@@ -149,8 +97,7 @@
         let cooldownTime = 10 * 60 * 1000; // 10 minutos en milisegundos
         let lastGenerationTime = 0;
         let cooldownInterval;
-        let timer;
-        const longPressDuration = 60000; // 1 minuto en milisegundos
+        let bingoButtonEnabled = false;
 
         function generateBingoCard() {
             const currentTime = new Date().getTime();
@@ -163,30 +110,17 @@
             bingoCard.innerHTML = '';
             let numbers = generateUniqueNumbers(16, 1, 100);
 
-            numbers.forEach(number => {
+            numbers.forEach((number, index) => {
                 const cell = document.createElement('div');
                 cell.className = 'bingo-number';
                 cell.textContent = number;
-                cell.onclick = () => {
-                    cell.classList.toggle('marked');
-                    const multiplication = document.createElement('div');
-                    multiplication.className = 'multiplicacion';
-                    multiplication.textContent = `${number} x ${number} = ${number * number}`;
-                    if (cell.classList.contains('marked')) {
-                        cell.appendChild(multiplication);
-                        multiplication.style.display = 'none';
-                    } else {
-                        const existingMultiplication = cell.querySelector('.multiplicacion');
-                        if (existingMultiplication) {
-                            existingMultiplication.remove();
-                        }
-                    }
-                };
+                cell.onclick = () => toggleCell(cell, index);
                 bingoCard.appendChild(cell);
             });
 
             lastGenerationTime = currentTime;
             document.getElementById('generateButton').disabled = true;
+            document.getElementById('bingoButton').disabled = true;
             startCooldown();
         }
 
@@ -197,6 +131,49 @@
                 numbers.add(randomNum);
             }
             return Array.from(numbers);
+        }
+
+        function toggleCell(cell, index) {
+            if (bingoButtonEnabled) return; // No permite desmarcar después de presionar "¡Bingo!"
+
+            cell.classList.toggle('marked');
+            checkBingo();
+        }
+
+        function checkBingo() {
+            const bingoCard = document.getElementById('bingoCard');
+            const cells = Array.from(bingoCard.children);
+            const lines = [
+                // Filas
+                [0, 1, 2, 3],
+                [4, 5, 6, 7],
+                [8, 9, 10, 11],
+                [12, 13, 14, 15],
+                // Columnas
+                [0, 4, 8, 12],
+                [1, 5, 9, 13],
+                [2, 6, 10, 14],
+                [3, 7, 11, 15],
+                // Diagonales
+                [0, 5, 10, 15],
+                [3, 6, 9, 12]
+            ];
+
+            let bingo = lines.some(line => line.every(index => cells[index].classList.contains('marked')));
+
+            const bingoButton = document.getElementById('bingoButton');
+            if (bingo) {
+                bingoButton.disabled = false;
+                bingoButton.onclick = lockBingo;
+            } else {
+                bingoButton.disabled = true;
+            }
+        }
+
+        function lockBingo() {
+            bingoButtonEnabled = true;
+            document.getElementById('bingoButton').disabled = true;
+            alert("¡Bingo! Ya no puedes desmarcar casillas.");
         }
 
         function startCooldown() {
@@ -215,36 +192,6 @@
                     document.getElementById('timer').textContent = `Espera ${minutes}m ${seconds}s para generar otra planilla.`;
                 }
             }, 1000);
-        }
-
-        document.addEventListener('mousedown', function() {
-            timer = setTimeout(() => {
-                let confirmar = confirm("¿Deseas revelar las respuestas seleccionadas?");
-                if (confirmar) {
-                    revelarMultiplicaciones();
-                }
-            }, longPressDuration);
-        });
-
-        document.addEventListener('mouseup', function() {
-            clearTimeout(timer);
-        });
-
-        function revelarMultiplicaciones() {
-            const markedCells = document.querySelectorAll('.bingo-number.marked');
-            markedCells.forEach(cell => {
-                const existingMultiplication = cell.querySelector('.multiplicacion');
-                if (existingMultiplication) {
-                    existingMultiplication.style.display = 'block';
-                } else {
-                    const number = parseInt(cell.textContent, 10);
-                    const multiplication = document.createElement('div');
-                    multiplication.className = 'multiplicacion';
-                    multiplication.textContent = `${number} x ${number} = ${number * number}`;
-                    cell.appendChild(multiplication);
-                    multiplication.style.display = 'block';
-                }
-            });
         }
     </script>
 
