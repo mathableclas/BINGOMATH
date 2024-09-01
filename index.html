@@ -43,12 +43,24 @@
             transition: transform 0.2s ease, background-color 0.2s ease;
             aspect-ratio: 1; /* Mantiene una relación de aspecto cuadrado */
             height: 100%;
+            position: relative;
         }
         .bingo-number:hover {
             transform: scale(1.1);
         }
         .marked {
             background-color: #4CAF50 !important;
+        }
+        .multiplicacion {
+            position: absolute;
+            bottom: 0.2em;
+            right: 0.5em;
+            font-size: 0.8rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.2em;
+            border-radius: 0.2em;
+            display: none;
         }
         .controls {
             display: flex;
@@ -134,9 +146,11 @@
     </div>
 
     <script>
-        let cooldownTime = 10 * 60 * 1000; // 5 minutos en milisegundos
+        let cooldownTime = 10 * 60 * 1000; // 10 minutos en milisegundos
         let lastGenerationTime = 0;
         let cooldownInterval;
+        let timer;
+        const longPressDuration = 10000; // 10 segundos
 
         function generateBingoCard() {
             const currentTime = new Date().getTime();
@@ -153,7 +167,21 @@
                 const cell = document.createElement('div');
                 cell.className = 'bingo-number';
                 cell.textContent = number;
-                cell.onclick = () => cell.classList.toggle('marked');
+                cell.onclick = () => {
+                    cell.classList.toggle('marked');
+                    const multiplication = document.createElement('div');
+                    multiplication.className = 'multiplicacion';
+                    multiplication.textContent = `${number} x ${number} = ${number * number}`;
+                    if (cell.classList.contains('marked')) {
+                        cell.appendChild(multiplication);
+                        multiplication.style.display = 'block';
+                    } else {
+                        const existingMultiplication = cell.querySelector('.multiplicacion');
+                        if (existingMultiplication) {
+                            existingMultiplication.remove();
+                        }
+                    }
+                };
                 bingoCard.appendChild(cell);
             });
 
@@ -187,6 +215,36 @@
                     document.getElementById('timer').textContent = `Espera ${minutes}m ${seconds}s para generar otra planilla.`;
                 }
             }, 1000);
+        }
+
+        document.addEventListener('mousedown', function() {
+            timer = setTimeout(() => {
+                let confirmar = confirm("¿Deseas revelar las respuestas seleccionadas?");
+                if (confirmar) {
+                    revelarMultiplicaciones();
+                }
+            }, longPressDuration);
+        });
+
+        document.addEventListener('mouseup', function() {
+            clearTimeout(timer);
+        });
+
+        function revelarMultiplicaciones() {
+            const markedCells = document.querySelectorAll('.bingo-number.marked');
+            markedCells.forEach(cell => {
+                const existingMultiplication = cell.querySelector('.multiplicacion');
+                if (existingMultiplication) {
+                    existingMultiplication.style.display = 'block';
+                } else {
+                    const number = parseInt(cell.textContent, 10);
+                    const multiplication = document.createElement('div');
+                    multiplication.className = 'multiplicacion';
+                    multiplication.textContent = `${number} x ${number} = ${number * number}`;
+                    cell.appendChild(multiplication);
+                    multiplication.style.display = 'block';
+                }
+            });
         }
     </script>
 
