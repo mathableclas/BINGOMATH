@@ -23,11 +23,11 @@
         }
         #bingoCard {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
             gap: 0.5em;
             margin-bottom: 1em;
-            max-width: 500px;
+            max-width: 400px; /* Ajustado para un diseño más compacto */
             width: 100%;
         }
         .bingo-number {
@@ -55,7 +55,7 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 500px;
+            max-width: 400px; /* Ajustado para un diseño más compacto */
         }
         button {
             padding: 0.75em 1.5em;
@@ -87,7 +87,7 @@
             }
             #bingoCard {
                 grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: repeat(5, 1fr);
+                grid-template-rows: repeat(4, 1fr);
             }
             .bingo-number {
                 font-size: 1.2rem;
@@ -106,8 +106,8 @@
                 font-size: 1.2rem;
             }
             #bingoCard {
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(6, 1fr);
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(4, 1fr);
             }
             .bingo-number {
                 font-size: 1rem;
@@ -147,7 +147,7 @@
 
             const bingoCard = document.getElementById('bingoCard');
             bingoCard.innerHTML = '';
-            let numbers = generateUniqueNumbers(20, 1, 100);
+            let numbers = generateUniqueNumbers(16, 1, 100);
 
             numbers.forEach(number => {
                 const cell = document.createElement('div');
