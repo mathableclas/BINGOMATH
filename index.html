@@ -150,7 +150,7 @@
         let lastGenerationTime = 0;
         let cooldownInterval;
         let timer;
-        const longPressDuration = 10000; // 10 segundos
+        const longPressDuration = 60000; // 1 minuto en milisegundos
 
         function generateBingoCard() {
             const currentTime = new Date().getTime();
@@ -174,7 +174,7 @@
                     multiplication.textContent = `${number} x ${number} = ${number * number}`;
                     if (cell.classList.contains('marked')) {
                         cell.appendChild(multiplication);
-                        multiplication.style.display = 'block';
+                        multiplication.style.display = 'none';
                     } else {
                         const existingMultiplication = cell.querySelector('.multiplicacion');
                         if (existingMultiplication) {
