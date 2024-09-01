@@ -136,6 +136,7 @@
             lastGenerationTime = currentTime;
             document.getElementById('generateButton').disabled = true;
             document.getElementById('bingoButton').disabled = true;
+            bingoButtonEnabled = false;
             startCooldown();
         }
 
@@ -173,27 +174,29 @@
                 [3, 6, 9, 12]
             ];
 
+            // Verifica si hay una línea completa
             let bingo = lines.some(line => line.every(index => cells[index].classList.contains('marked')));
 
             const bingoButton = document.getElementById('bingoButton');
             if (bingo) {
                 bingoButton.disabled = false;
-                bingoButton.onclick = () => lockBingo(cells, lines.find(line => line.every(index => cells[index].classList.contains('marked'))));
+                bingoButton.onclick = () => lockBingo(cells);
             } else {
                 bingoButton.disabled = true;
             }
         }
 
-        function lockBingo(cells, winningLine) {
+        function lockBingo(cells) {
             bingoButtonEnabled = true;
             document.getElementById('bingoButton').disabled = true;
 
-            winningLine.forEach(index => {
-                const cell = cells[index];
-                const number = parseInt(cell.textContent);
-                const multiplicationValue = multiplicationResults[number];
-                if (multiplicationValue) {
-                    cell.textContent = multiplicationValue;
+            cells.forEach(cell => {
+                if (cell.classList.contains('marked')) {
+                    const number = parseInt(cell.textContent);
+                    const multiplicationValue = multiplicationResults[number];
+                    if (multiplicationValue) {
+                        cell.textContent = multiplicationValue;
+                    }
                 }
             });
         }
