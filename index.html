@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilla de Bingo con Tablas de Multiplicar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-template-rows: repeat(4, 60px);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .bingo-card div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border: 2px solid #333;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .bingo-card div.marked {
+            background-color: #4caf50;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bingo-card" id="bingoCard"></div>
+    <button onclick="generateBingoCard()">Generar Nueva Planilla</button>
+
+    <script>
+        function generateBingoCard() {
+            const card = document.getElementById('bingoCard');
+            card.innerHTML = '';
+            
+            // Generar todos los resultados de las tablas de multiplicar del 1 al 10
+            const results = [];
+            for (let i = 1; i <= 10; i++) {
+                for (let j = 1; j <= 10; j++) {
+                    results.push(i * j);
+                }
+            }
+
+            // Seleccionar 20 resultados aleatorios
+            const selectedResults = [];
+            while (selectedResults.length < 20) {
+                const randomIndex = Math.floor(Math.random() * results.length);
+                const result = results.splice(randomIndex, 1)[0];
+                selectedResults.push(result);
+            }
+
+            // Crear celdas con los resultados seleccionados
+            selectedResults.forEach(result => {
+                const cell = document.createElement('div');
+                cell.textContent = result;
+                cell.addEventListener('click', () => {
+                    cell.classList.toggle('marked');
+                });
+                card.appendChild(cell);
+            });
+        }
+
+        // Generar una planilla inicial al cargar la página
+        generateBingoCard();
+    </script>
+
+</body>
+</html>
