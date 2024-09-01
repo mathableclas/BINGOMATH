@@ -201,15 +201,6 @@
 
         function lockBingo() {
             const bingoCard = document.getElementById('bingoCard');
-            const cells = Array.from(bingoCard.children);
-            
-            cells.forEach(cell => {
-                if (cell.classList.contains('marked')) {
-                    const value = parseInt(cell.textContent, 10);
-                    cell.textContent = multiplicationResults[value] || value;
-                }
-            });
-
             // Deshabilitar todas las celdas después de hacer bingo
             bingoCard.querySelectorAll('.bingo-number').forEach(cell => cell.onclick = null);
             document.getElementById('bingoButton').disabled = true;
