@@ -134,14 +134,14 @@
     </div>
 
     <script>
-        let cooldownTime = 5 * 60 * 1000; // 5 minutos en milisegundos
+        let cooldownTime = 10 * 60 * 1000; // 5 minutos en milisegundos
         let lastGenerationTime = 0;
         let cooldownInterval;
 
         function generateBingoCard() {
             const currentTime = new Date().getTime();
             if (currentTime - lastGenerationTime < cooldownTime) {
-                alert("Debes esperar 5 minutos antes de generar una nueva planilla.");
+                alert("Debes esperar 10 minutos antes de generar una nueva planilla.");
                 return;
             }
 
