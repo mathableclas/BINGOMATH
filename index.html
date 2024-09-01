@@ -85,13 +85,18 @@
 
     <h1>¡BINGO!</h1>
 
-    <div id="bingoCard"></div>
-
     <div class="controls">
+        <label for="gameMode">Selecciona el modo de juego:</label>
+        <select id="gameMode">
+            <option value="line">Bingo en Línea</option>
+            <option value="full">Bingo Full</option>
+        </select>
         <button id="generateButton" onclick="generateBingoCard()">Generar Nueva Planilla</button>
         <button id="bingoButton" disabled>¡Bingo!</button>
         <div class="timer" id="timer"></div>
     </div>
+
+    <div id="bingoCard"></div>
 
     <script>
         let cooldownTime = 10 * 60 * 1000; // 10 minutos en milisegundos
@@ -174,31 +179,41 @@
                 [3, 6, 9, 12]
             ];
 
-            // Verifica si hay una línea completa
-            let bingo = lines.some(line => line.every(index => cells[index].classList.contains('marked')));
+            const gameMode = document.getElementById('gameMode').value;
+
+            let bingo = false;
+            if (gameMode === 'line') {
+                // Verifica si hay una línea completa (horizontal, vertical o diagonal)
+                bingo = lines.some(line => line.every(index => cells[index].classList.contains('marked')));
+            } else if (gameMode === 'full') {
+                // Verifica si toda la planilla está marcada
+                bingo = cells.every(cell => cell.classList.contains('marked'));
+            }
 
             const bingoButton = document.getElementById('bingoButton');
             if (bingo) {
                 bingoButton.disabled = false;
-                bingoButton.onclick = () => lockBingo(cells);
+                bingoButton.onclick = () => lockBingo();
             } else {
                 bingoButton.disabled = true;
             }
         }
 
-        function lockBingo(cells) {
-            bingoButtonEnabled = true;
-            document.getElementById('bingoButton').disabled = true;
-
+        function lockBingo() {
+            const bingoCard = document.getElementById('bingoCard');
+            const cells = Array.from(bingoCard.children);
+            
             cells.forEach(cell => {
                 if (cell.classList.contains('marked')) {
-                    const number = parseInt(cell.textContent);
-                    const multiplicationValue = multiplicationResults[number];
-                    if (multiplicationValue) {
-                        cell.textContent = multiplicationValue;
-                    }
+                    const value = parseInt(cell.textContent, 10);
+                    cell.textContent = multiplicationResults[value] || value;
                 }
             });
+
+            // Deshabilitar todas las celdas después de hacer bingo
+            bingoCard.querySelectorAll('.bingo-number').forEach(cell => cell.onclick = null);
+            document.getElementById('bingoButton').disabled = true;
+            bingoButtonEnabled = true;
         }
 
         function startCooldown() {
